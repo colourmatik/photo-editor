@@ -15,7 +15,7 @@ const PickColorMenu = memo(function PickColorMenu({
 }: PickColorMenuProps) {
   return (
     <div className='pick-color-menu'>
-      LMB
+      Press LMB
       <div className="pick-color-info">
         <div style={{ background: `rgb(${[...color1.rgb]})` }} className='pick-color' />
         <div className="pick-colors">
@@ -26,7 +26,7 @@ const PickColorMenu = memo(function PickColorMenu({
       </div>
       <p>{ `X: ${color1.x}; Y: ${color1.y}` }</p>
       <Divider />
-      CTRL+LMB
+      Press ALT+LMB
       <div className="pick-color-info">
         <div style={{ background: `rgb(${[...color2.rgb]})` }} className='pick-color' />
         <div className="pick-colors">

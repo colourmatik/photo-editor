@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Tabs, Modal, Button } from 'antd';
-import {SidePanel} from "./components/SidePanel/SidePanel";
+import { Tabs, Modal, Button, Tooltip } from 'antd';
+import { SidePanel } from "./components/SidePanel/SidePanel";
 import ChangeSizeModal from './components/ChangeSizeModal/ChangeSizeModal';
 import tabsItemsOnFunc from './utils/tabsItemsOnFunc';
 import getNewDataNearestNeighbour from './utils/getNewDataNearestNeighbour';
@@ -10,10 +10,10 @@ import FilterModal from './components/FilterModal/FilterModal';
 import getCanvasNCtx from './utils/getCanvasNCtx';
 import './App.css'
 import IconButton from "./components/IconButton/IconButton";
-import {ReactComponent as DownloadSvg} from "./assets/download.svg";
+import { ReactComponent as DownloadSvg } from "./assets/download.svg";
 import { ReactComponent as UploadSvg } from './assets/upload.svg';
-import {ReactComponent as MoveSvg} from "./assets/move.svg";
-import {ReactComponent as PipetteSvg} from "./assets/pipette.svg";
+import { ReactComponent as MoveSvg } from "./assets/move.svg";
+import { ReactComponent as PipetteSvg } from "./assets/pipette.svg";
 
 
 export interface LoadedImageI {
@@ -78,9 +78,9 @@ function App() {
       renderImageFull(img);
       setLoadedImage({
         ...loadedImage,
-        imageOriginalWidth: img.naturalWidth, 
-        imageOriginalHeight: img.naturalHeight}
-      );
+        imageOriginalWidth: img.naturalWidth,
+        imageOriginalHeight: img.naturalHeight
+      });
     })
   }, [loadedImage.imageUri])
 
@@ -108,7 +108,7 @@ function App() {
 
   const renderImageFull = (img: HTMLImageElement) => {
     const [canvas, _] = getCanvasNCtx(canvasRef);
-    
+
     const maxWidth = canvas.parentElement!.clientWidth;
     const maxHeight = canvas.parentElement!.clientHeight;
 
@@ -119,20 +119,20 @@ function App() {
 
     canvas.width = img.width * scale;
     canvas.height = img.height * scale;
-    
+
     setImageScale(Math.floor(scale * 100));
     renderImage();
   }
 
   const changeImageScale = (scale: number) => {
     const [canvas, _] = getCanvasNCtx(canvasRef);
-  
+
     const scaleMultiplyer = scale / 100;
-  
+
     const imgPromise = imageUriToImgPromise(loadedImage.imageUri);
     imgPromise.then((img) => {
-      canvas.width = img.width * scaleMultiplyer; 
-      canvas.height = img.height * scaleMultiplyer; 
+      canvas.width = img.width * scaleMultiplyer;
+      canvas.height = img.height * scaleMultiplyer;
       renderImage();
     })
   }
@@ -157,29 +157,29 @@ function App() {
   }
 
   const pixelInfoChange = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const {p, x, y} = getPixelInfo(e);
-    setPixelInfo({ 
-      rgb: [p[0], p[1], p[2]], 
-      x: x, 
-      y: y, 
-    }) 
+    const { p, x, y } = getPixelInfo(e);
+    setPixelInfo({
+      rgb: [p[0], p[1], p[2]],
+      x: x,
+      y: y,
+    })
   }
 
   const colorChange = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (currentTool !== 1) return;
-    const {p, x, y} = getPixelInfo(e);
-    if (e.ctrlKey) {
-      return setColor2({ 
-        rgb: [p[0], p[1], p[2]], 
-        x: x, 
-        y: y, 
-      }) 
+    const { p, x, y } = getPixelInfo(e);
+    if (e.altKey) {
+      return setColor2({
+        rgb: [p[0], p[1], p[2]],
+        x: x,
+        y: y,
+      })
     }
-    return setColor1({ 
-      rgb: [p[0], p[1], p[2]], 
-      x: x, 
-      y: y, 
-    }) 
+    return setColor1({
+      rgb: [p[0], p[1], p[2]],
+      x: x,
+      y: y,
+    })
   }
 
   const onSliderChange = (scale: number) => {
@@ -190,11 +190,11 @@ function App() {
     setCurrentTool(id);
   }
 
-  const resizeImage =(newWidth: number, newHeight: number) => {
+  const resizeImage = (newWidth: number, newHeight: number) => {
     const [canvas, ctx] = getCanvasNCtx(canvasRef);
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
     const newData = getNewDataNearestNeighbour(imageData, newWidth, newHeight);
-    setLoadedImage({...loadedImage, imageUri: newData})
+    setLoadedImage({ ...loadedImage, imageUri: newData })
   };
 
 
@@ -246,37 +246,34 @@ function App() {
   const onImgViewMouseMove = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!dragRef.current.drag || !imgViewRef.current) return;
-  
+
     const maxScrollLeft = imgViewRef.current.scrollWidth - imgViewRef.current.clientWidth;
     const maxScrollTop = imgViewRef.current.scrollHeight - imgViewRef.current.clientHeight;
-  
+
     const imgView = e.target as HTMLDivElement;
     const x = e.pageX - imgView.offsetLeft;
     const y = e.pageY - imgView.offsetTop;
     const walkX = (x - dragRef.current.startX) * 1;
     const walkY = (y - dragRef.current.startY) * 1;
-  
-    // Проверка границ прокрутки
-    if ((imgViewRef.current.scrollLeft - walkX >= maxScrollLeft && maxScrollLeft !== 0) || (imgViewRef.current.scrollLeft - walkX < 0 && maxScrollLeft !== 0)) return
-    if ((imgViewRef.current.scrollTop - walkY >= maxScrollTop && maxScrollTop !== 0) || (imgViewRef.current.scrollTop - walkY < 0  && maxScrollTop !== 0)) return
-  
-    // Обновление прокрутки по оси X
+
+    if ((imgViewRef.current.scrollLeft - walkX >= maxScrollLeft && maxScrollLeft !== 0) || (imgViewRef.current.scrollLeft - walkX < 0 && maxScrollLeft !== 0)) return;
+    if ((imgViewRef.current.scrollTop - walkY >= maxScrollTop && maxScrollTop !== 0) || (imgViewRef.current.scrollTop - walkY < 0 && maxScrollTop !== 0)) return;
+
     imgViewRef.current.scrollLeft = dragRef.current.scrollX - walkX;
     dragRef.current.scrollX = dragRef.current.scrollX - walkX;
     dragRef.current.startX = x;
-  
-    // Обновление прокрутки по оси Y
+
     imgViewRef.current.scrollTop = dragRef.current.scrollY - walkY;
     dragRef.current.scrollY = dragRef.current.scrollY - walkY;
     dragRef.current.startY = y;
   };
 
   const changeLoadedImage = (data: string) => {
-    setLoadedImage({...loadedImage, imageUri: data});
+    setLoadedImage({ ...loadedImage, imageUri: data });
   };
 
   const closeModal = () => {
-    setModal({...modal, show: false});
+    setModal({ ...modal, show: false });
   }
 
   return (
@@ -284,122 +281,128 @@ function App() {
       <div className="app">
         <div className="menu-panel">
           <div className="menu-btns">
-            <Button className="upload" type="primary" onClick={ () => openModal(
-                "Upload",
-                <Tabs defaultActiveKey="1" items={ tabsItemsOnFunc(uploadImageToCanvas) } />
+            <Button className="upload" type="primary" onClick={() => openModal(
+              "Upload",
+              <Tabs defaultActiveKey="1" items={tabsItemsOnFunc(uploadImageToCanvas)} />
             )}>
-              <UploadSvg  className='upload-icon'/>
+              <UploadSvg className='upload-icon' />
               Upload
             </Button>
-            
+
           </div>
-          <div className="tools">
-          <IconButton
-                active={ currentTool === 0 }
-                component={ MoveSvg }
-                onIconButtonClick={ () => onCurrentToolChange(0) }
-            />
-            <IconButton
-                active={ currentTool === 1 }
-                component={ PipetteSvg }
-                onIconButtonClick={ () => onCurrentToolChange(1) }
-            />
-            <Button className="curves" type="primary" onClick={ () => {
+          <div className="tools" >
+            <Tooltip>
+              <IconButton
+                active={currentTool === 0}
+                component={MoveSvg}
+                onIconButtonClick={() => onCurrentToolChange(0)}
+                title="Image moving tool"
+              />
+            </Tooltip>
+            <Tooltip>
+              <IconButton
+                active={currentTool === 1}
+                component={PipetteSvg}
+                onIconButtonClick={() => onCurrentToolChange(1)}
+                title="Color picking tool"
+              />
+            </Tooltip>
+            <Button className="curves" type="primary" onClick={() => {
               setImageScale(100);
               openModal(
-                  "Gradient correction",
-                  <CurvesModal
-                      imageRef={ canvasRef }
-                      onGammaCorrectionChange={ (data) => changeLoadedImage(data) }
-                      closeModal={closeModal}
-                  />
+                "Gradient correction",
+                <CurvesModal
+                  imageRef={canvasRef}
+                  onGammaCorrectionChange={(data) => changeLoadedImage(data)}
+                  closeModal={closeModal}
+                />
               )
             }}>
               Curves
             </Button>
-            <Button className="filtration" type="primary" onClick={ () => {
+            <Button className="filtration" type="primary" onClick={() => {
               setImageScale(100);
               openModal(
-                  "Filtration",
-                  <FilterModal
-                      imageRef={ canvasRef }
-                      onFilterChange={ (data) => changeLoadedImage(data) }
-                      closeModal={closeModal}
-                  />
+                "Filtration",
+                <FilterModal
+                  imageRef={canvasRef}
+                  onFilterChange={(data) => changeLoadedImage(data)}
+                  closeModal={closeModal}
+                />
               )
             }}>
               Filters
             </Button>
-            <Button className="change-size" type="primary" onClick={ () => openModal(
-                "Size change",
-                <ChangeSizeModal
-                    width={ loadedImage.imageOriginalWidth }
-                    height={ loadedImage.imageOriginalHeight }
-                    onChangeSizeSubmit={ (width, height) => resizeImage(width, height) }
-                    closeModal={closeModal}
-                />
+            <Button className="change-size" type="primary" onClick={() => openModal(
+              "Size change",
+              <ChangeSizeModal
+                width={loadedImage.imageOriginalWidth}
+                height={loadedImage.imageOriginalHeight}
+                onChangeSizeSubmit={(width, height) => resizeImage(width, height)}
+                closeModal={closeModal}
+              />
             )}>
               Change size
             </Button>
-            </div>
-            <Button className="download" type="primary" onClick={ downloadImage }>
-            <DownloadSvg  className='download-icon'/>
-              <span>Download</span>
-            </Button>
+          </div>
+          <Button className="download" type="primary" onClick={downloadImage}>
+            <DownloadSvg className='download-icon' />
+            <span>Download</span>
+          </Button>
         </div>
         <div className="work-panel">
-          { currentTool === 0
+          {currentTool === 0
             ?
             <div
-              ref={ imgViewRef }
+              ref={imgViewRef}
               className="img-view"
-              onMouseDown={ onImgViewMouseDown }
-              onMouseMove={ onImgViewMouseMove }
-              onMouseUp={ onImgViewMouseUp }
+              onMouseDown={onImgViewMouseDown}
+              onMouseMove={onImgViewMouseMove}
+              onMouseUp={onImgViewMouseUp}
             >
               <canvas
-                ref={ canvasRef }
+                ref={canvasRef}
                 className='canvas'
-                onMouseMove={ pixelInfoChange }
-                onClick={ colorChange }
+                onMouseMove={pixelInfoChange}
+                onClick={colorChange}
               />
             </div>
             :
             <div
-              ref={ imgViewRef }
+              ref={imgViewRef}
               className="img-view"
             >
               <canvas
-                ref={ canvasRef }
+                ref={canvasRef}
                 className='canvas'
-                onMouseMove={ pixelInfoChange }
-                onClick={ colorChange }
+                onMouseMove={pixelInfoChange}
+                onClick={colorChange}
               />
               <SidePanel
-                  color1={ color1 }
-                  color2={ color2 }
-                  currentTool={ currentTool }/>
+                color1={color1}
+                color2={color2}
+                currentTool={currentTool} />
             </div>
           }
           <Footer
-            loadedImage={ loadedImage }
-            pixelInfo={ pixelInfo }
-            color1={ color1 }
-            color2={ color2 }
-            scale={ scale }
-            currentTool={ currentTool }
-            onCurrentToolChange={ onCurrentToolChange }
-            onSliderChange={ onSliderChange }
+            loadedImage={loadedImage}
+            pixelInfo={pixelInfo}
+            color1={color1}
+            color2={color2}
+            scale={scale}
+            currentTool={currentTool}
+            onCurrentToolChange={onCurrentToolChange}
+            onSliderChange={onSliderChange}
           />
         </div>
       </div>
       <Modal
-        title={ modal.title }
-        open={ modal.show }
+        title={modal.title}
+        open={modal.show}
         onCancel={closeModal}
         footer={[]}
       >
-        { modal.content }
+        {modal.content}
       </Modal>
     </div>
   )
