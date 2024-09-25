@@ -232,6 +232,7 @@ const CurvesModal = ({
       />
       <div className="curves-inputs">
         <div className="curves-input">
+          <p>Enter:</p>
           <p className='curves-input-label'>In</p>
           <InputNumber
               min={ 0 }
@@ -250,6 +251,7 @@ const CurvesModal = ({
           />
         </div>
         <div className="curves-input">
+          <p>Exit:</p>
           <p className='curves-input-label'>In</p>
           <InputNumber
               min={ 0 }
